@@ -20,7 +20,7 @@
     "test:debug": "vitest --inspect-brk --no-file-parallelism",
     "test:e2e": "vitest run --config ./vitest.config.e2e.ts",
     "typeorm": "typeorm-ts-node-esm",
-    "migration:generate": "npm run typeorm -- migration:generate src/database/migrations/migration -d src/database/data-source.ts",
+    "migration:generate": "npm run typeorm -- migration:generate -d src/database/data-source.ts",
     "migration:run": "npm run typeorm -- migration:run -d src/database/data-source.ts",
     "migration:revert": "npm run typeorm -- migration:revert -d src/database/data-source.ts"
   },
