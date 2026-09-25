@@ -121,7 +121,7 @@ export class UsersService {
   async findByEmailWithPassword(email: string): Promise<User | null> {
     return this.usersRepository
       .createQueryBuilder('user')
-      .addSelect('user.pasword')
+      .addSelect('user.passwordHash')
       .where('user.email = :email', {
         email,
       })
