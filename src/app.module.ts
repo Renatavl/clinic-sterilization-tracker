@@ -4,6 +4,8 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { AppController } from './app.controller.ts';
 import { UsersModule } from './users/users.module.ts';
 import { AuthModule } from './auth/auth.module.ts';
+import { PassportConfigModule } from './auth/passport-config.module.ts';
+import { EquipmentModule } from './equipment/equipment.module.ts';
 
 @Module({
   imports: [
@@ -24,8 +26,10 @@ import { AuthModule } from './auth/auth.module.ts';
         synchronize: false,
       }),
     }),
+    PassportConfigModule,
     UsersModule,
-    AuthModule
+    AuthModule,
+    EquipmentModule,
   ],
   controllers: [AppController],
 })

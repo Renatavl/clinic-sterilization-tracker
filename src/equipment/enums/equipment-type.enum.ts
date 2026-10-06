@@ -1,0 +1,5 @@
+export enum EquipmentType {
+  AUTOCLAVE = 'AUTOCLAVE',
+  ULTRASONIC_CLEANER = 'ULTRASONIC_CLEANER',
+  OTHER = 'OTHER',
+}
