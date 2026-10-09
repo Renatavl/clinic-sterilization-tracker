@@ -1,0 +1,5 @@
+export enum InstrumentStatus {
+  AVAILABLE = 'AVAILABLE',
+  IN_STERILIZATION = 'IN_STERILIZATION',
+  STERILE = 'STERILE',
+}

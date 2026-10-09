@@ -6,6 +6,7 @@ import { UsersModule } from './users/users.module.ts';
 import { AuthModule } from './auth/auth.module.ts';
 import { PassportConfigModule } from './auth/passport-config.module.ts';
 import { EquipmentModule } from './equipment/equipment.module.ts';
+import { InstrumentsModule } from './instruments/instruments.module.ts';
 
 @Module({
   imports: [
@@ -30,6 +31,7 @@ import { EquipmentModule } from './equipment/equipment.module.ts';
     UsersModule,
     AuthModule,
     EquipmentModule,
+    InstrumentsModule,
   ],
   controllers: [AppController],
 })
