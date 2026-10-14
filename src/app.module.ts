@@ -9,6 +9,7 @@ import { EquipmentModule } from './equipment/equipment.module.ts';
 import { InstrumentsModule } from './instruments/instruments.module.ts';
 import { MaintenanceModule } from './maintenance/maintenance.module.ts';
 import { SterilizationModule } from './sterilization/sterilization.module.ts';
+import { AttachmentsModule } from './attachments/attachments.module.ts';
 
 @Module({
   imports: [
@@ -36,6 +37,7 @@ import { SterilizationModule } from './sterilization/sterilization.module.ts';
     InstrumentsModule,
     MaintenanceModule,
     SterilizationModule,
+    AttachmentsModule,
   ],
   controllers: [AppController],
 })
