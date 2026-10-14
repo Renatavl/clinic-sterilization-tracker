@@ -8,6 +8,7 @@ import { PassportConfigModule } from './auth/passport-config.module.ts';
 import { EquipmentModule } from './equipment/equipment.module.ts';
 import { InstrumentsModule } from './instruments/instruments.module.ts';
 import { MaintenanceModule } from './maintenance/maintenance.module.ts';
+import { SterilizationModule } from './sterilization/sterilization.module.ts';
 
 @Module({
   imports: [
@@ -34,6 +35,7 @@ import { MaintenanceModule } from './maintenance/maintenance.module.ts';
     EquipmentModule,
     InstrumentsModule,
     MaintenanceModule,
+    SterilizationModule,
   ],
   controllers: [AppController],
 })
