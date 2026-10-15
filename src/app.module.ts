@@ -11,6 +11,7 @@ import { MaintenanceModule } from './maintenance/maintenance.module.ts';
 import { SterilizationModule } from './sterilization/sterilization.module.ts';
 import { AttachmentsModule } from './attachments/attachments.module.ts';
 import { ReportsModule } from './reports/reports.module.ts';
+import { AnalyticsModule } from './analytics/analytics.module.ts';
 
 @Module({
   imports: [
@@ -40,6 +41,7 @@ import { ReportsModule } from './reports/reports.module.ts';
     SterilizationModule,
     AttachmentsModule,
     ReportsModule,
+    AnalyticsModule,
   ],
   controllers: [AppController],
 })
