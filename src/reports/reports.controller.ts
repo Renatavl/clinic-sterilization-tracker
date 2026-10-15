@@ -15,8 +15,23 @@ import { RolesGuard } from '../auth/guards/roles.guard.ts';
 import { ReportsService } from './reports.service.ts';
 import { Roles } from '../auth/decorators/roles.decorator.ts';
 import { UserRole } from '../users/enums/user-role.enum.ts';
+import {
+  ApiBearerAuth,
+  ApiConflictResponse,
+  ApiForbiddenResponse,
+  ApiNotFoundResponse,
+  ApiOkResponse,
+  ApiOperation,
+  ApiParam,
+  ApiProduces,
+  ApiTags,
+  ApiUnauthorizedResponse,
+} from '@nestjs/swagger';
 
-
+@ApiTags('Reports')
+@ApiBearerAuth('access-token')
+@ApiUnauthorizedResponse({ description: 'Missing or invalid JWT' })
+@ApiForbiddenResponse({ description: 'Insufficient role' })
 @Controller('reports')
 @UseGuards(
   JwtAuthGuard,
@@ -34,6 +49,21 @@ export class ReportsController {
     UserRole.STAFF,
   )
   @HttpCode(HttpStatus.OK)
+  @ApiOperation({ summary: 'Generate sterilization report' })
+  @ApiParam({
+    name: 'batchId',
+    description: 'Sterilization batch UUID',
+    format: 'uuid',
+  })
+  @ApiProduces('text/html')
+  @ApiOkResponse({
+    description: 'Generated HTML sterilization report',
+    content: {
+      'text/html': { schema: { type: 'string' } },
+    },
+  })
+  @ApiNotFoundResponse({ description: 'Sterilization batch not found' })
+  @ApiConflictResponse({ description: 'Sterilization batch is not completed' })
   async generateSterilizationReport(
     @Param(
       'batchId',
@@ -70,6 +100,20 @@ export class ReportsController {
     UserRole.STAFF,
   )
   @HttpCode(HttpStatus.OK)
+  @ApiOperation({ summary: 'Generate maintenance report' })
+  @ApiParam({
+    name: 'maintenanceId',
+    description: 'Maintenance record UUID',
+    format: 'uuid',
+  })
+  @ApiProduces('text/html')
+  @ApiOkResponse({
+    description: 'Generated HTML maintenance report',
+    content: {
+      'text/html': { schema: { type: 'string' } },
+    },
+  })
+  @ApiNotFoundResponse({ description: 'Maintenance record not found' })
   async generateMaintenanceReport(
     @Param(
       'maintenanceId',

@@ -1,7 +1,7 @@
 import {
   OmitType,
   PartialType,
-} from '@nestjs/mapped-types';
+} from '@nestjs/swagger';
 
 import { CreateMaintenanceRecordDto } from './create-maintenance-record.dto.ts';
 
