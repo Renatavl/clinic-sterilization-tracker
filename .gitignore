@@ -3,8 +3,8 @@ dist/
 coverage/
 .env
 
-uploads/
-reports/
+/uploads/
+/reports/
 
 *.log
 .DS_Store

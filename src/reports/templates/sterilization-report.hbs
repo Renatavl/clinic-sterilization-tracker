@@ -1,0 +1,64 @@
+<html lang='en'>
+  <head>
+    <meta charset='UTF-8' />
+    <title>{{title}}</title>
+  </head>
+
+  <body>
+    <h1>{{title}}</h1>
+
+    <p>
+      <strong>Batch ID:</strong>
+      {{batchId}}
+    </p>
+
+    <p>
+      <strong>Status:</strong>
+      {{status}}
+    </p>
+
+    <h2>Equipment</h2>
+
+    <p>
+      <strong>Name:</strong>
+      {{equipmentName}}
+    </p>
+
+    <p>
+      <strong>Serial number:</strong>
+      {{equipmentSerialNumber}}
+    </p>
+
+    <p>
+      <strong>Type:</strong>
+      {{equipmentType}}
+    </p>
+
+    <p>
+      <strong>Started:</strong>
+      {{startedAt}}
+    </p>
+
+    <p>
+      <strong>Completed:</strong>
+      {{completedAt}}
+    </p>
+
+    <h2>Instruments</h2>
+
+    <ul>
+      {{#each instruments}}
+        <li>
+          {{name}}
+          —
+          {{instrumentCode}}
+        </li>
+      {{/each}}
+    </ul>
+
+    {{#if notes}}
+      <h2>Notes</h2>
+      <p>{{notes}}</p>
+    {{/if}}
+  </body>
+</html>

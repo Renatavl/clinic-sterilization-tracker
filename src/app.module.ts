@@ -10,6 +10,7 @@ import { InstrumentsModule } from './instruments/instruments.module.ts';
 import { MaintenanceModule } from './maintenance/maintenance.module.ts';
 import { SterilizationModule } from './sterilization/sterilization.module.ts';
 import { AttachmentsModule } from './attachments/attachments.module.ts';
+import { ReportsModule } from './reports/reports.module.ts';
 
 @Module({
   imports: [
@@ -38,6 +39,7 @@ import { AttachmentsModule } from './attachments/attachments.module.ts';
     MaintenanceModule,
     SterilizationModule,
     AttachmentsModule,
+    ReportsModule,
   ],
   controllers: [AppController],
 })
