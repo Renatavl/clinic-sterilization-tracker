@@ -6,6 +6,7 @@ import { Equipment } from './entities/equipment.entity.ts';
 import { CreateEquipmentDto } from './dto/create-equipment.dto.ts';
 import { AppException } from '../common/exceptions/app.exception.ts';
 import { UpdateEquipmentDto } from './dto/update-equipment.dto.ts';
+import { EquipmentQueryDto } from './dto/equipment-query.dto.ts';
 
 @Injectable()
 export class EquipmentService {
@@ -43,12 +44,55 @@ export class EquipmentService {
     return this.equipmentRepository.save(equipment);
   }
 
-  async findAll() {
-    return this.equipmentRepository.find({
-      order: {
-        createdAt: 'DESC',
+  async findAll(query: EquipmentQueryDto) {
+    const { page, limit, search, type, status } = query;
+
+    const queryBuilder =
+      this.equipmentRepository.createQueryBuilder('equipment');
+
+    if (search?.trim()) {
+      queryBuilder.andWhere(
+        `(
+        equipment.name ILIKE :search
+        OR equipment.serialNumber ILIKE :search
+        OR equipment.manufacturer ILIKE :search
+        OR equipment.model ILIKE :search
+      )`,
+        {
+          search: `%${search.trim()}%`,
+        },
+      );
+    }
+
+    if (type !== undefined) {
+      queryBuilder.andWhere('equipment.type = :type', {
+        type,
+      });
+    }
+
+    if (status !== undefined) {
+      queryBuilder.andWhere('equipment.status = :status', {
+        status,
+      });
+    }
+
+    const skip = (page - 1) * limit;
+
+    queryBuilder.orderBy('equipment.createdAt', 'DESC').skip(skip).take(limit);
+
+    const [equipment, totalItems] = await queryBuilder.getManyAndCount();
+
+    return {
+      items: equipment,
+
+      meta: {
+        page,
+        limit,
+        totalItems,
+
+        totalPages: Math.ceil(totalItems / limit),
       },
-    });
+    };
   }
 
   async findOne(id: string) {

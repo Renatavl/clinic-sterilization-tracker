@@ -9,6 +9,7 @@ import {
   ParseUUIDPipe,
   Patch,
   Post,
+  Query,
   UseGuards,
 } from '@nestjs/common';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard.ts';
@@ -18,60 +19,42 @@ import { Roles } from '../auth/decorators/roles.decorator.ts';
 import { UserRole } from '../users/enums/user-role.enum.ts';
 import { CreateMaintenanceRecordDto } from './dto/create-maintenance-record.dto.ts';
 import { UpdateMaintenanceRecordDto } from './dto/update-maintenance-record.dto.ts';
+import { MaintenanceQueryDto } from './dto/maintenance-query.dto.ts';
 
 @Controller('maintenance')
-@UseGuards(
-  JwtAuthGuard,
-  RolesGuard,
-)
+@UseGuards(JwtAuthGuard, RolesGuard)
 export class MaintenanceController {
-  constructor(
-    private readonly maintenanceService:
-      MaintenanceService,
-  ) {}
+  constructor(private readonly maintenanceService: MaintenanceService) {}
 
   @Post()
-  @Roles(
-    UserRole.ADMIN,
-    UserRole.STAFF,
-  )
+  @Roles(UserRole.ADMIN, UserRole.STAFF)
   create(
     @Body()
     dto: CreateMaintenanceRecordDto,
   ) {
-    return this.maintenanceService.create(
-      dto,
-    );
+    return this.maintenanceService.create(dto);
   }
 
   @Get()
-  @Roles(
-    UserRole.ADMIN,
-    UserRole.STAFF,
-  )
-  findAll() {
-    return this.maintenanceService.findAll();
+  @Roles(UserRole.ADMIN, UserRole.STAFF)
+  findAll(
+    @Query()
+    query: MaintenanceQueryDto,
+  ) {
+    return this.maintenanceService.findAll(query);
   }
 
   @Get(':id')
-  @Roles(
-    UserRole.ADMIN,
-    UserRole.STAFF,
-  )
+  @Roles(UserRole.ADMIN, UserRole.STAFF)
   findOne(
     @Param('id', ParseUUIDPipe)
     id: string,
   ) {
-    return this.maintenanceService.findOne(
-      id,
-    );
+    return this.maintenanceService.findOne(id);
   }
 
   @Patch(':id')
-  @Roles(
-    UserRole.ADMIN,
-    UserRole.STAFF,
-  )
+  @Roles(UserRole.ADMIN, UserRole.STAFF)
   update(
     @Param('id', ParseUUIDPipe)
     id: string,
@@ -79,10 +62,7 @@ export class MaintenanceController {
     @Body()
     dto: UpdateMaintenanceRecordDto,
   ) {
-    return this.maintenanceService.update(
-      id,
-      dto,
-    );
+    return this.maintenanceService.update(id, dto);
   }
 
   @Delete(':id')
@@ -92,8 +72,6 @@ export class MaintenanceController {
     @Param('id', ParseUUIDPipe)
     id: string,
   ) {
-    await this.maintenanceService.remove(
-      id,
-    );
+    await this.maintenanceService.remove(id);
   }
 }

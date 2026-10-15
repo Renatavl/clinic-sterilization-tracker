@@ -9,6 +9,7 @@ import {
   ParseUUIDPipe,
   Patch,
   Post,
+  Query,
   UseGuards,
 } from '@nestjs/common';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard.ts';
@@ -18,39 +19,30 @@ import { Roles } from '../auth/decorators/roles.decorator.ts';
 import { UserRole } from '../users/enums/user-role.enum.ts';
 import { CreateInstrumentDto } from './dto/create-instrument.dto.ts';
 import { UpdateInstrumentDto } from './dto/update-instrument.dto.ts';
+import { InstrumentQueryDto } from './dto/instrument-query.dto.ts';
 
 @Controller('instruments')
-@UseGuards(
-  JwtAuthGuard,
-  RolesGuard,
-)
+@UseGuards(JwtAuthGuard, RolesGuard)
 export class InstrumentsController {
-  constructor(
-    private readonly instrumentsService: InstrumentsService,
-  ) {}
+  constructor(private readonly instrumentsService: InstrumentsService) {}
 
   @Post()
   @Roles(UserRole.ADMIN)
-  create(
-    @Body() dto: CreateInstrumentDto,
-  ) {
+  create(@Body() dto: CreateInstrumentDto) {
     return this.instrumentsService.create(dto);
   }
 
   @Get()
-  @Roles(
-    UserRole.ADMIN,
-    UserRole.STAFF,
-  )
-  findAll() {
-    return this.instrumentsService.findAll();
+  @Roles(UserRole.ADMIN, UserRole.STAFF)
+  findAll(
+    @Query()
+    query: InstrumentQueryDto,
+  ) {
+    return this.instrumentsService.findAll(query);
   }
 
   @Get(':id')
-  @Roles(
-    UserRole.ADMIN,
-    UserRole.STAFF,
-  )
+  @Roles(UserRole.ADMIN, UserRole.STAFF)
   findOne(
     @Param('id', ParseUUIDPipe)
     id: string,
@@ -67,10 +59,7 @@ export class InstrumentsController {
     @Body()
     dto: UpdateInstrumentDto,
   ) {
-    return this.instrumentsService.update(
-      id,
-      dto,
-    );
+    return this.instrumentsService.update(id, dto);
   }
 
   @Delete(':id')

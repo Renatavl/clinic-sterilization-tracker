@@ -9,6 +9,7 @@ import {
   ParseUUIDPipe,
   Patch,
   Post,
+  Query,
   UseGuards,
 } from '@nestjs/common';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard.ts';
@@ -18,6 +19,7 @@ import { UserRole } from '../users/enums/user-role.enum.ts';
 import { Roles } from '../auth/decorators/roles.decorator.ts';
 import { CreateEquipmentDto } from './dto/create-equipment.dto.ts';
 import { UpdateEquipmentDto } from './dto/update-equipment.dto.ts';
+import { EquipmentQueryDto } from './dto/equipment-query.dto.ts';
 
 @Controller('equipment')
 @UseGuards(JwtAuthGuard, RolesGuard)
@@ -32,8 +34,11 @@ export class EquipmentController {
 
   @Get()
   @Roles(UserRole.ADMIN, UserRole.STAFF)
-  findAll() {
-    return this.equipmentService.findAll();
+  findAll(
+    @Query()
+    query: EquipmentQueryDto,
+  ) {
+    return this.equipmentService.findAll(query);
   }
 
   @Get(':id')

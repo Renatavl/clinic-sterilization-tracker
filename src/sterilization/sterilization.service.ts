@@ -17,6 +17,7 @@ import { UpdateSterilizationBatchDto } from './dto/update-sterilization-batch.dt
 import { SterilizationStatus } from './enums/sterilization-status.enum.ts';
 import { CompleteSterilizationBatchDto } from './dto/complete-sterilization-batch.dto.ts';
 import { SterilizationResult } from './enums/sterilization-result.enum.ts';
+import { SterilizationQueryDto } from './dto/sterilization-query.dto.ts';
 
 @Injectable()
 export class SterilizationService {
@@ -85,17 +86,54 @@ export class SterilizationService {
     return this.batchesRepository.save(batch);
   }
 
-  async findAll() {
-    return this.batchesRepository.find({
-      relations: {
-        equipment: true,
-        instruments: true,
-      },
+  async findAll(query: SterilizationQueryDto) {
+    const { page, limit, search, status, equipmentId } = query;
 
-      order: {
-        createdAt: 'DESC',
+    const queryBuilder = this.batchesRepository
+      .createQueryBuilder('batch')
+      .leftJoinAndSelect('batch.equipment', 'equipment')
+      .leftJoinAndSelect('batch.instruments', 'instrument');
+
+    if (search?.trim()) {
+      queryBuilder.andWhere(
+        `(
+        equipment.name ILIKE :search
+        OR equipment.serialNumber ILIKE :search
+      )`,
+        {
+          search: `%${search.trim()}%`,
+        },
+      );
+    }
+
+    if (status !== undefined) {
+      queryBuilder.andWhere('batch.status = :status', {
+        status,
+      });
+    }
+
+    if (equipmentId !== undefined) {
+      queryBuilder.andWhere('equipment.id = :equipmentId', {
+        equipmentId,
+      });
+    }
+
+    const skip = (page - 1) * limit;
+
+    queryBuilder.orderBy('batch.createdAt', 'DESC').skip(skip).take(limit);
+
+    const [batches, totalItems] = await queryBuilder.getManyAndCount();
+
+    return {
+      items: batches,
+
+      meta: {
+        page,
+        limit,
+        totalItems,
+        totalPages: Math.ceil(totalItems / limit),
       },
-    });
+    };
   }
 
   async findOne(id: string) {

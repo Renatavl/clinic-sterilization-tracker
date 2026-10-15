@@ -5,6 +5,7 @@ import { Repository } from 'typeorm';
 import { CreateInstrumentDto } from './dto/create-instrument.dto.ts';
 import { AppException } from '../common/exceptions/app.exception.ts';
 import { UpdateInstrumentDto } from './dto/update-instrument.dto.ts';
+import { InstrumentQueryDto } from './dto/instrument-query.dto.ts';
 
 @Injectable()
 export class InstrumentsService {
@@ -38,12 +39,47 @@ export class InstrumentsService {
     return this.instrumentsRepository.save(instrument);
   }
 
-  async findAll() {
-    return this.instrumentsRepository.find({
-      order: {
-        createdAt: 'DESC',
+  async findAll(query: InstrumentQueryDto) {
+    const { page, limit, search, status } = query;
+
+    const queryBuilder =
+      this.instrumentsRepository.createQueryBuilder('instrument');
+
+    if (search?.trim()) {
+      queryBuilder.andWhere(
+        `(
+        instrument.name ILIKE :search
+        OR instrument.instrumentCode ILIKE :search
+      )`,
+        {
+          search: `%${search.trim()}%`,
+        },
+      );
+    }
+
+    if (status !== undefined) {
+      queryBuilder.andWhere('instrument.status = :status', {
+        status,
+      });
+    }
+
+    const skip = (page - 1) * limit;
+
+    queryBuilder.orderBy('instrument.createdAt', 'DESC').skip(skip).take(limit);
+
+    const [instruments, totalItems] = await queryBuilder.getManyAndCount();
+
+    return {
+      items: instruments,
+
+      meta: {
+        page,
+        limit,
+        totalItems,
+
+        totalPages: Math.ceil(totalItems / limit),
       },
-    });
+    };
   }
 
   async findOne(id: string) {

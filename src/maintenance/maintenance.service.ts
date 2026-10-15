@@ -7,6 +7,7 @@ import { CreateMaintenanceRecordDto } from './dto/create-maintenance-record.dto.
 import { addMonths, parseISO } from 'date-fns';
 import { AppException } from '../common/exceptions/app.exception.ts';
 import { UpdateMaintenanceRecordDto } from './dto/update-maintenance-record.dto.ts';
+import { MaintenanceQueryDto } from './dto/maintenance-query.dto.ts';
 
 @Injectable()
 export class MaintenanceService {
@@ -35,29 +36,64 @@ export class MaintenanceService {
     return this.maintenanceRepository.save(maintenance);
   }
 
-  async findAll() {
-    return this.maintenanceRepository.find({
+  async findAll(query: MaintenanceQueryDto) {
+    const { page, limit, search, equipmentId } = query;
+
+    const queryBuilder = this.maintenanceRepository
+      .createQueryBuilder('maintenance')
+      .leftJoinAndSelect('maintenance.equipment', 'equipment');
+
+    if (search?.trim()) {
+      queryBuilder.andWhere(
+        `(
+        equipment.name ILIKE :search
+        OR equipment.serialNumber ILIKE :search
+        OR maintenance.notes ILIKE :search
+      )`,
+        {
+          search: `%${search.trim()}%`,
+        },
+      );
+    }
+
+    if (equipmentId !== undefined) {
+      queryBuilder.andWhere('equipment.id = :equipmentId', {
+        equipmentId,
+      });
+    }
+
+    const skip = (page - 1) * limit;
+
+    queryBuilder
+      .orderBy('maintenance.createdAt', 'DESC')
+      .skip(skip)
+      .take(limit);
+
+    const [maintenanceRecords, totalItems] =
+      await queryBuilder.getManyAndCount();
+
+    return {
+      items: maintenanceRecords,
+
+      meta: {
+        page,
+        limit,
+        totalItems,
+        totalPages: Math.ceil(totalItems / limit),
+      },
+    };
+  }
+
+  async findOne(id: string) {
+    const maintenance = await this.maintenanceRepository.findOne({
+      where: {
+        id,
+      },
+
       relations: {
         equipment: true,
       },
-
-      order: {
-        createdAt: 'DESC',
-      },
     });
-  }
-
-   async findOne(id: string) {
-    const maintenance =
-      await this.maintenanceRepository.findOne({
-        where: {
-          id,
-        },
-
-        relations: {
-          equipment: true,
-        },
-      });
 
     if (!maintenance) {
       throw new AppException(
@@ -70,48 +106,35 @@ export class MaintenanceService {
     return maintenance;
   }
 
-  async update(
-    id: string,
-    dto: UpdateMaintenanceRecordDto,
-  ) {
-    const maintenance =
-      await this.findOne(id);
+  async update(id: string, dto: UpdateMaintenanceRecordDto) {
+    const maintenance = await this.findOne(id);
 
-    let shouldRecalculateNextDate =
-      false;
+    let shouldRecalculateNextDate = false;
 
     if (dto.performedAt !== undefined) {
-      maintenance.performedAt =
-        parseISO(dto.performedAt);
+      maintenance.performedAt = parseISO(dto.performedAt);
 
       shouldRecalculateNextDate = true;
     }
 
-    if (
-      dto.intervalMonths !== undefined
-    ) {
-      maintenance.intervalMonths =
-        dto.intervalMonths;
+    if (dto.intervalMonths !== undefined) {
+      maintenance.intervalMonths = dto.intervalMonths;
 
       shouldRecalculateNextDate = true;
     }
 
     if (shouldRecalculateNextDate) {
-      maintenance.nextMaintenanceAt =
-        addMonths(
-          maintenance.performedAt,
-          maintenance.intervalMonths,
-        );
+      maintenance.nextMaintenanceAt = addMonths(
+        maintenance.performedAt,
+        maintenance.intervalMonths,
+      );
     }
 
     if (dto.notes !== undefined) {
-      maintenance.notes =
-        dto.notes.trim() || null;
+      maintenance.notes = dto.notes.trim() || null;
     }
 
-    await this.maintenanceRepository.save(
-      maintenance,
-    );
+    await this.maintenanceRepository.save(maintenance);
 
     return this.findOne(id);
   }
@@ -119,8 +142,6 @@ export class MaintenanceService {
   async remove(id: string) {
     await this.findOne(id);
 
-    await this.maintenanceRepository.softDelete(
-      id,
-    );
+    await this.maintenanceRepository.softDelete(id);
   }
 }

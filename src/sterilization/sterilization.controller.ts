@@ -9,6 +9,7 @@ import {
   ParseUUIDPipe,
   Patch,
   Post,
+  Query,
   UseGuards,
 } from '@nestjs/common';
 
@@ -20,6 +21,7 @@ import { UserRole } from '../users/enums/user-role.enum.ts';
 import { CreateSterilizationBatchDto } from './dto/create-sterilization-batch.dto.ts';
 import { UpdateSterilizationBatchDto } from './dto/update-sterilization-batch.dto.ts';
 import { CompleteSterilizationBatchDto } from './dto/complete-sterilization-batch.dto.ts';
+import { SterilizationQueryDto } from './dto/sterilization-query.dto.ts';
 
 @Controller('sterilization-batches')
 @UseGuards(JwtAuthGuard, RolesGuard)
@@ -37,8 +39,11 @@ export class SterilizationController {
 
   @Get()
   @Roles(UserRole.ADMIN, UserRole.STAFF)
-  findAll() {
-    return this.sterilizationService.findAll();
+  findAll(
+    @Query()
+    query: SterilizationQueryDto,
+  ) {
+    return this.sterilizationService.findAll(query);
   }
 
   @Get(':id')
