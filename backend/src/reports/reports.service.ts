@@ -4,7 +4,7 @@ import { fileURLToPath } from 'url';
 
 import { HttpStatus, Injectable } from '@nestjs/common';
 
-import * as fs from 'fs-extra';
+import fs from 'fs-extra';
 
 import Handlebars from 'handlebars';
 
